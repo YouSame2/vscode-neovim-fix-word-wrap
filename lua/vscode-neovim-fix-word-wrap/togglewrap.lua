@@ -120,39 +120,37 @@ function M.setup(user_config)
     desc = "Toggle or set wrap (use 'on'/'off' or no arg to toggle)",
   })
 
-  if conf.enable_recording_enter_autocmd or conf.enable_vscode_sync_autocmd then
-    local my_group = vim.api.nvim_create_augroup("ToggleWrap", { clear = true })
+  local my_group = vim.api.nvim_create_augroup("ToggleWrap", { clear = true })
 
-    if conf.enable_recording_enter_autocmd then
-      vim.api.nvim_create_autocmd({ "RecordingEnter" }, {
-        group = my_group,
-        callback = function()
-          local ok, err = pcall(vim.cmd, "ToggleWrap off")
-          if not ok then
-            notify("Error disabling wrap: " .. err, vim.log.levels.ERROR)
-            return
-          end
-          notify("Macro detected, wordWrap & keymaps disabled...", vim.log.levels.INFO)
-        end,
-      })
-    end
-
-    if conf.enable_vscode_sync_autocmd and vim.g.vscode then
-      vim.api.nvim_create_autocmd({ "CursorHold" }, {
-        group = my_group,
-        callback = function()
-          local enabled = utils.get_vscode_wrap().enabled
-          local cmd = enabled and "ToggleWrap on" or "ToggleWrap off"
-          -- use a delay to avoid startup errors
-          vim.defer_fn(function()
-            pcall(vim.cmd, "silent " .. cmd)
-          end, 300)
-        end,
-      })
-    end
+  if conf.enable_recording_enter_autocmd then
+    vim.api.nvim_create_autocmd({ "RecordingEnter" }, {
+      group = my_group,
+      callback = function()
+        local ok, err = pcall(vim.cmd, "ToggleWrap off")
+        if not ok then
+          notify("Error disabling wrap: " .. err, vim.log.levels.ERROR)
+          return
+        end
+        notify("Macro detected, wordWrap & keymaps disabled...", vim.log.levels.INFO)
+      end,
+    })
   end
 
-  if conf.enable_vscode_sync_autocmd then
+  if conf.enable_vscode_sync_autocmd and vim.g.vscode then
+    vim.api.nvim_create_autocmd({ "CursorHold" }, {
+      group = my_group,
+      callback = function()
+        local enabled = utils.get_vscode_wrap().enabled
+        local cmd = enabled and "ToggleWrap on" or "ToggleWrap off"
+        -- use a delay to avoid startup errors
+        vim.defer_fn(function()
+          pcall(vim.cmd, "silent " .. cmd)
+        end, 300)
+      end,
+    })
+  end
+
+  local function init_on_startup()
     -- use defer to prevent errors on vscode-neovim load
     vim.defer_fn(function()
       local enabled
@@ -166,6 +164,7 @@ function M.setup(user_config)
     end, 300)
   end
 
+  init_on_startup()
 end
 
 return M
