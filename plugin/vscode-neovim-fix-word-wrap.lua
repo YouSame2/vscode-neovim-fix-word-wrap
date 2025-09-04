@@ -1,1 +1,5 @@
-vim.api.nvim_create_user_command("MyFirstFunction", require("vscode-neovim-fix-word-wrap").hello, {})
+-- Minimal plugin entry: load the plugin and run setup with defaults.
+-- Users can call require('vscode-neovim-fix-word-wrap').setup({...}) themselves to override.
+pcall(function()
+	require("vscode-neovim-fix-word-wrap").setup()
+end)

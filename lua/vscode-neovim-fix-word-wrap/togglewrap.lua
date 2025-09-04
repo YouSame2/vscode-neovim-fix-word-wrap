@@ -8,16 +8,13 @@ function M.setup(user_config)
   local conf = config.config
   local km_spec = config.build_runtime_keymaps()
 
-  local vscode
-  if vim.g.vscode then
-    vscode = require("vscode")
-    vim.notify = vscode.notify
-  end
+  local vscode = vim.g.vscode and require("vscode") or nil
+  local notify = (vscode and vscode.notify) or vim.notify
 
   if conf.togglewrap_keymap and conf.togglewrap_keymap ~= "" then
     vim.keymap.set("n", conf.togglewrap_keymap, function()
       if utils.is_macro_recording() or utils.is_macro_executing() then
-        vim.notify("ToggleWrap disabled during macro execution", vim.log.levels.WARN)
+        notify("ToggleWrap disabled during macro execution", vim.log.levels.WARN)
         return
       end
 
@@ -33,8 +30,9 @@ function M.setup(user_config)
 
   ---Toggle or explicitly set word wrap and related editor options.
   ---@param enabled boolean? If true, enable wrap; if false, disable wrap; if nil, toggle current state.
+  ---@param silent boolean? If true, suppress notifications.
   ---@return boolean The resulting state of wrap (true = enabled, false = disabled)
-  local function ToggleWrap(enabled)
+  local function ToggleWrap(enabled, silent)
     ---@type boolean
     if enabled == nil then
       local current = vim.g.vscode and utils.get_vscode_wrap().enabled or vim.wo.wrap
@@ -86,8 +84,8 @@ function M.setup(user_config)
     pcall(vim.api.nvim_set_current_tabpage, cur_tab)
     pcall(vim.api.nvim_set_current_win, cur_win)
 
-    if not vim.b.silent then
-      vim.notify(enabled and "✅ Wrap enabled" or "❌ Wrap disabled")
+    if not silent then
+      notify(enabled and "✅ Wrap enabled" or "❌ Wrap disabled")
     end
 
     return enabled
@@ -96,7 +94,7 @@ function M.setup(user_config)
   vim.api.nvim_create_user_command("ToggleWrap", function(ctx)
     local arg = ctx.args
     if arg == nil or arg == "" then
-      ToggleWrap()
+      ToggleWrap(nil, ctx.smods.silent)
       return
     end
 
@@ -108,12 +106,12 @@ function M.setup(user_config)
       bool = false
     else
       if not ctx.smods.silent then
-        vim.notify("ToggleWrap: invalid argument. Use 'on'/'off' or no arg to toggle.", vim.log.levels.WARN)
+        notify("ToggleWrap: invalid argument. Use 'on'/'off' or no arg to toggle.", vim.log.levels.WARN)
       end
       return
     end
 
-    ToggleWrap(bool)
+    ToggleWrap(bool, ctx.smods.silent)
   end, {
     complete = function()
       return { "on", "off" }
@@ -131,16 +129,16 @@ function M.setup(user_config)
         callback = function()
           local ok, err = pcall(vim.cmd, "ToggleWrap off")
           if not ok then
-            vim.notify("Error disabling wrap: " .. err, vim.log.levels.ERROR)
+            notify("Error disabling wrap: " .. err, vim.log.levels.ERROR)
             return
           end
-          vim.notify("Macro detected, wordWrap & keymaps disabled...", vim.log.levels.INFO)
+          notify("Macro detected, wordWrap & keymaps disabled...", vim.log.levels.INFO)
         end,
       })
     end
 
     if conf.enable_vscode_sync_autocmd and vim.g.vscode then
-      vim.api.nvim_create_autocmd({ "CursorHold", "VimEnter" }, {
+      vim.api.nvim_create_autocmd({ "CursorHold" }, {
         group = my_group,
         callback = function()
           local enabled = utils.get_vscode_wrap().enabled
@@ -153,6 +151,21 @@ function M.setup(user_config)
       })
     end
   end
+
+  if conf.enable_vscode_sync_autocmd then
+    -- use defer to prevent errors on vscode-neovim load
+    vim.defer_fn(function()
+      local enabled
+      if vim.g.vscode then
+        enabled = utils.get_vscode_wrap().enabled
+      else
+        enabled = vim.wo.wrap
+      end
+      local cmd = enabled and "ToggleWrap on" or "ToggleWrap off"
+      pcall(vim.cmd, "silent " .. cmd)
+    end, 300)
+  end
+
 end
 
 return M
