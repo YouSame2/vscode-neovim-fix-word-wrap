@@ -1,29 +1,53 @@
--- TODO: add feat: capture previous keymap state to restore later after unsetting. aka my <leaderY/C/D keymaps
 local M = {}
 
 --- Register a list of keymaps.
--- @param km table list of mappings (each entry: {mode, lhs, rhs, opts})
-function M.set_wrap_keymaps(km)
-  if type(km) ~= "table" then
-    vim.notify("set_wrap_keymaps: expected table, got " .. type(km), vim.log.levels.WARN)
-    return
+-- @param config table The plugin's configuration table.
+function M.set_wrap_keymaps(config)
+  -- Set mappings
+  for _, mode_maps in pairs(config.mappings) do
+    for _, keymap_config in pairs(mode_maps) do
+      if keymap_config.enabled and keymap_config.map then
+        local map = keymap_config.map
+        vim.keymap.set(map[1], map[2], map[3], map[4])
+      end
+    end
   end
-  for _, m in ipairs(km) do
-    local mode, lhs, rhs, opts = m[1], m[2], m[3], m[4]
-    vim.keymap.set(mode, lhs, rhs, opts)
+
+  -- Set remappings
+  for _, keymap_config in pairs(config.remappings) do
+    if keymap_config.enabled and keymap_config.map then
+      local map = keymap_config.map
+      vim.keymap.set(map[1], map[2], map[3], map[4])
+    end
   end
 end
 
---- Remove a list of keymaps. legacy since using vim.g.my_is_wrap to track state
--- @param km table list of mappings (each entry: {mode, lhs, rhs, opts})
-function M.unset_wrap_keymaps(km)
-  if type(km) ~= "table" then
-    vim.notify("unset_wrap_keymaps: expected table, got " .. type(km), vim.log.levels.WARN)
-    return
+--- Remove a list of keymaps.
+-- @param config table The plugin's configuration table.
+function M.unset_wrap_keymaps(config)
+  local function del_keymap(keymap_config)
+    if not (keymap_config and keymap_config.enabled and keymap_config.map) then return end
+    local map = keymap_config.map
+    local mode, lhs = map[1], map[2]
+    if type(mode) == "table" then
+      for _, m in ipairs(mode) do
+        pcall(vim.keymap.del, m, lhs)
+      end
+    else
+      pcall(vim.keymap.del, mode, lhs)
+    end
   end
-  for _, m in ipairs(km) do
-    local mode, lhs = m[1], m[2]
-    pcall(vim.keymap.del, mode, lhs)
+
+  -- Unset mappings
+  for _, mode_maps in pairs(config.mappings) do
+    for _, keymap_config in pairs(mode_maps) do
+      del_keymap(keymap_config)
+    end
+  end
+
+  -- Unset remappings
+  for _, keymap_config in pairs(config.remappings) do
+    del_keymap(keymap_config)
   end
 end
 

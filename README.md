@@ -8,4 +8,18 @@ Install the plugin with your favorite plugin manager.
 
 ## Usage
 
-This plugin provides commands to toggle word wrap.
+Run the command `:ToggleWrap` to toggle word wrap.
+
+## Configuration
+
+You can configure the plugin by calling the `setup` function.
+
+```lua
+require('vscode-neovim-fix-word-wrap').setup({
+  keymaps = true, -- or false
+})
+```
+
+### Options
+
+- `keymaps`: (default: `true`) - If set to `true`, the plugin will create keymaps for toggling word wrap.

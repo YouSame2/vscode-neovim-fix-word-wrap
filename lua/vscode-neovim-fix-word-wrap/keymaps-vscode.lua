@@ -1,23 +1,8 @@
---[[
-NOTES ABOUT KEYMAPS... it gets confusing
-  -- ignore "o" in j/k that gets complex usually u want to 3yj according to relative lines not screen lines
-  -- check vim.fn.mode() to avoid issues with visual block mode
-  -- we can add v:count == 0 ? check to keep 3j function the same as without wrap? need to ask manintainer about this. for now i just include it in my personal remapping of j.
-  -- is_macro_executing to fix keymap issues when executing macros. plays back keys as if theres no word wrap.
-  -- i learned after re-writing these keymaps 20 times that for proper functionality in macros we need to use expr in mappings
-  -- i prefer to remap I/A to be wrap aware. but these could be changed to something else to prevent user confusion.
-  -- same with D/C/Y
-
-  KNOWN ISSUES:
-  -- currently using these keymaps in a ":norm" without bang will cause issues. recommend toggleing off wrap before using command.
-
---]]
-
-local utils = require("vscode.word_wrap.utils")
+local utils = require("vscode-neovim-fix-word-wrap.utils")
 local vscode = require("vscode")
 
-M = {
-  {
+return {
+  n_gj = {
     "n",
     "gj",
     function()
@@ -31,8 +16,7 @@ M = {
     end,
     { expr = true, silent = true, desc = "cursor N lines downward (include 'wrap')" },
   },
-
-  {
+  v_gj = {
     "v",
     "gj",
     function()
@@ -46,8 +30,7 @@ M = {
     end,
     { expr = true, silent = true, desc = "cursor N lines downward (include 'wrap')" },
   },
-
-  {
+  n_gk = {
     "n",
     "gk",
     function()
@@ -61,8 +44,7 @@ M = {
     end,
     { expr = true, silent = true, desc = "cursor N lines up (include 'wrap')" },
   },
-
-  {
+  v_gk = {
     "v",
     "gk",
     function()
@@ -76,7 +58,7 @@ M = {
     end,
     { expr = true, silent = true, desc = "cursor N lines up (include 'wrap')" },
   },
-  {
+  n_g0 = {
     "n",
     "g0",
     function()
@@ -90,7 +72,7 @@ M = {
     end,
     { expr = true, silent = true, desc = "first char of wrapped line (wrap-aware)" },
   },
-  {
+  v_g0 = {
     "v",
     "g0",
     function()
@@ -104,9 +86,8 @@ M = {
     end,
     { expr = true, silent = true, desc = "first non-blank character of the line (include 'wrap')" },
   },
-
-  {
-    { "o" },
+  o_g0 = {
+    "o",
     "g0",
     function()
       if utils.is_macro_executing() then
@@ -117,7 +98,7 @@ M = {
     end,
     { expr = true, silent = true, desc = "first non-blank character of the line (include 'wrap')" },
   },
-  {
+  n_g_caret = {
     "n",
     "g^",
     function()
@@ -131,7 +112,7 @@ M = {
     end,
     { expr = true, silent = true, desc = "first non-blank character of the line (include 'wrap')" },
   },
-  {
+  v_g_caret = {
     "v",
     "g^",
     function()
@@ -147,8 +128,8 @@ M = {
     end,
     { expr = true, silent = true, desc = "first non-blank character of the line (include 'wrap')" },
   },
-  {
-    { "o" },
+  o_g_caret = {
+    "o",
     "g^",
     function()
       if utils.is_macro_executing() then
@@ -158,7 +139,7 @@ M = {
     end,
     { expr = true, silent = true, desc = "first non-blank character of the line (include 'wrap')" },
   },
-  {
+  n_g_dollar = {
     "n",
     "g$",
     function()
@@ -175,7 +156,7 @@ M = {
     end,
     { expr = true, silent = true, desc = "end of the line (include 'wrap')" },
   },
-  {
+  v_g_dollar = {
     "v",
     "g$",
     function()
@@ -190,8 +171,8 @@ M = {
     end,
     { expr = true, silent = true, desc = "end of the line (include 'wrap')" },
   },
-  {
-    { "o" },
+  o_g_dollar = {
+    "o",
     "g$",
     function()
       if utils.is_macro_executing() then
@@ -201,7 +182,7 @@ M = {
     end,
     { expr = true, silent = true, desc = "end of the line (include 'wrap')" },
   },
-  {
+  n_I = {
     "n",
     "I",
     function()
@@ -215,7 +196,7 @@ M = {
     end,
     { expr = true, silent = true, desc = "I (include 'wrap')" },
   },
-  {
+  n_A = {
     "n",
     "A",
     function()
@@ -229,8 +210,7 @@ M = {
     end,
     { expr = true, silent = true, desc = "A (include 'wrap')" },
   },
-  -- NOTE: below changes behavior of Y,D,C to respect line wrap. see note at top of file.
-  {
+  n_D = {
     "n",
     "D",
     function()
@@ -242,7 +222,7 @@ M = {
     end,
     { expr = true, remap = true, desc = "[D]elete to end of line (include 'wrap')" },
   },
-  {
+  n_C = {
     "n",
     "C",
     function()
@@ -254,7 +234,7 @@ M = {
     end,
     { expr = true, remap = true, desc = "[C]hange to end of line (include 'wrap')" },
   },
-  {
+  n_Y = {
     "n",
     "Y",
     function()
@@ -266,37 +246,82 @@ M = {
     end,
     { expr = true, remap = true, desc = "[Y]ank to end of line (include 'wrap')" },
   },
-  -- all keymaps user would put in their config for proper word wrap behavior
-  {
-    { "n", "v" },
+  n_j = {
+    "n",
     "j",
     "v:count == 0 ? 'gj' : 'j'",
     { expr = true, remap = true, desc = "cursor N lines downward (include 'wrap')" },
   },
-  {
-    { "n", "v" },
+  v_j = {
+    "v",
+    "j",
+    "v:count == 0 ? 'gj' : 'j'",
+    { expr = true, remap = true, desc = "cursor N lines downward (include 'wrap')" },
+  },
+  n_k = {
+    "n",
     "k",
     "v:count == 0 ? 'gk' : 'k'",
     { expr = true, remap = true, desc = "cursor N lines up (include 'wrap')" },
   },
-  {
-    { "n", "v", "o" },
+  v_k = {
+    "v",
+    "k",
+    "v:count == 0 ? 'gk' : 'k'",
+    { expr = true, remap = true, desc = "cursor N lines up (include 'wrap')" },
+  },
+  n_0 = {
+    "n",
     "0",
     "g0",
     { remap = true, desc = "first char of the line (include 'wrap')" },
   },
-  {
-    { "n", "v", "o" },
+  v_0 = {
+    "v",
+    "0",
+    "g0",
+    { remap = true, desc = "first char of the line (include 'wrap')" },
+  },
+  o_0 = {
+    "o",
+    "0",
+    "g0",
+    { remap = true, desc = "first char of the line (include 'wrap')" },
+  },
+  n_caret = {
+    "n",
     "^",
     "g^",
     { remap = true, desc = "first non-blank character of the line (include 'wrap')" },
   },
-  {
-    { "n", "v", "o" },
+  v_caret = {
+    "v",
+    "^",
+    "g^",
+    { remap = true, desc = "first non-blank character of the line (include 'wrap')" },
+  },
+  o_caret = {
+    "o",
+    "^",
+    "g^",
+    { remap = true, desc = "first non-blank character of the line (include 'wrap')" },
+  },
+  n_dollar = {
+    "n",
+    "$",
+    "g$",
+    { remap = true, desc = "end of the line (include 'wrap')" },
+  },
+  v_dollar = {
+    "v",
+    "$",
+    "g$",
+    { remap = true, desc = "end of the line (include 'wrap')" },
+  },
+  o_dollar = {
+    "o",
     "$",
     "g$",
     { remap = true, desc = "end of the line (include 'wrap')" },
   },
 }
-
-return M
