@@ -23,3 +23,8 @@ require('vscode-neovim-fix-word-wrap').setup({
 ### Options
 
 - `keymaps`: (default: `true`) - If set to `true`, the plugin will create keymaps for toggling word wrap.
+
+### TODOS
+
+- add silent toggle keymap option
+

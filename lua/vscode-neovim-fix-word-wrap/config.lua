@@ -54,7 +54,7 @@ M.config = {
   },
 }
 
-function M.setup(user_config)
+function M.configure(user_config)
   M.config = vim.tbl_deep_extend("force", M.config, user_config or {})
 end
 

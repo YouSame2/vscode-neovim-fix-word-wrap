@@ -1,4 +1,4 @@
-local toggle = require('vscode-neovim-fix-word-wrap.togglewrap')
+local toggle = require('vscode-neovim-fix-word-wrap')
 local config = require('vscode-neovim-fix-word-wrap.config')
 local utils = require('vscode-neovim-fix-word-wrap.utils')
 
