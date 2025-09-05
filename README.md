@@ -11,6 +11,15 @@ Put simply: word wrap keymaps should work the same in VSCode Neovim as they do i
 This plugin also improves the word wrap experience in regular Neovim. Motions like `gj`, `gk`, and `g0` always work as expected with wrap, and macros won't break due to wrap keymaps. If you use word wrap in Neovim or edit a LOT of markdown file, try it out.
 
 ## What it Does
+https://github.com/user-attachments/assets/d91fac08-dd6c-4460-b75d-92c2493130c2
+
+https://github.com/user-attachments/assets/03fded94-a4fe-4889-a9e2-c5bf755f8eca
+
+https://github.com/user-attachments/assets/f7604671-3f62-4f69-b1ca-e10f653a5184
+
+https://github.com/user-attachments/assets/48a45b81-5991-4749-82f4-b1e293652da6
+
+https://github.com/user-attachments/assets/94d93dc9-9788-4501-a268-6d77258a5fdf
 
 ## Installation
 
