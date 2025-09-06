@@ -78,4 +78,3 @@ function M.is_macro_recording()
 end
 
 return M
-
