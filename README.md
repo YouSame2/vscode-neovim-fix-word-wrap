@@ -1,25 +1,49 @@
 # vscode-neovim-fix-word-wrap
 
-Basically title...
+Basically title... word wrap drove me mad in neovim & vscode-neovim, so I fixed it.
 
-A Neovim plugin to fix word wrap issues in BOTH the VSCode-neovim extension and Neovim. By default, keymaps to move and operate over **_visual_** lines (e.g. `g$`, `vg$`, `yg$`) in VSCode are either broken or incomplete in the VSCode Neovim extension. This plugin aims to replicate Neovim word wrap keymap behavior as closely as possible, including macro support and fixes.
+#### THE WHAT:
 
-Put simply: word wrap keymaps should work the same in VSCode Neovim as they do in Neovim. Default Neovim keys should work out of the box for everyone, but as seen in [this PR](https://github.com/vscode-neovim/vscode-neovim/pull/2539), that's not the case—so I made this plugin.
+By default, keymaps to move and operate over **_visual_** lines (e.g. `g$`, `vg$`, `yg$`) in [ VSCode-neovim extension ](https://github.com/vscode-neovim/vscode-neovim) are either broken or incomplete. This plugin aims to replicate Neovim word wrap keymap behavior (i.e. vg$ should select to end of **_visual_** line) as closely as possible, including macro support and fixes.
+
+Put simply, word wrap keymaps should work the same in VSCode Neovim as they do in Neovim. I believe default Neovim keys should work out of the box for everyone, but as seen in [this PR](https://github.com/vscode-neovim/vscode-neovim/pull/2539), that's not the case—so I made this plugin.
+
+#### THE WHY:
+
+Trust me — in the VSCode extension, it's not as simple as in Neovim to just set the `g0` or `g$` keymaps. There are a lot of "hacky" ways to replicate the proper behavior (for example, `y0` shouldn't include the character under the cursor, but `y$` should). Things break down very quickly if you change just **_ONE_** thing. See `keymaps-vscode.lua` for yourself.
 
 ## Works in Neovim Too
 
-This plugin also improves the word wrap experience in regular Neovim. Motions like `gj`, `gk`, and `g0` always work as expected with wrap, and macros won't break due to wrap keymaps. If you use word wrap in Neovim or edit a LOT of markdown file, try it out.
+This plugin also improves the word wrap experience in regular Neovim. Motions like `gj`, `gk`, and `g0` always work as expected with wrap enabled, and macros won't break because of wrap keymaps. If you use word wrap in Neovim or edit many Markdown files, give it a try.
 
 ## What it Does
-https://github.com/user-attachments/assets/d91fac08-dd6c-4460-b75d-92c2493130c2
 
-https://github.com/user-attachments/assets/03fded94-a4fe-4889-a9e2-c5bf755f8eca
+Here's a quick list of features — videos demonstrating them appear below:
+
+- Create mappings that respect visual lines for: `gj`, `gk`, `g0`, `g$`, `g^`, `j`, `k`, `0`, `$`, `^`.
+- `j`/`k` motions respect relative line numbers: `j` alone moves down one visual line, while `4j` moves down four relative lines.
+- Mappings are provided for normal, visual, and operator-pending modes. That means `vg0`/`v0` or `yg$`/`y$` apply their respective operations to the visual line.
+- Additional useful mappings: `I`, `A`, `Y`, `C`, `D` — each applies its operation to the visual line.
+- One-to-one implementation of text operations: backward operations (e.g., `yg0`/`y0`) do not include the character under the cursor, while forward operations do.
+- `g$` and `$` respect the user's `virtualedit` setting.
+- The plugin automatically falls back to non-wrap keymaps in visual-block mode, while recording macros, and during macro execution (even with wrap enabled!). This prevents unintended behavior when recording or replaying macros.
+- Provides the `:ToggleWrap` user command and a keymap to quickly toggle global word wrap for all open buffers/windows/tabs (yes even in Neovim :D).
+
+#### Demo: Improve Macros
 
 https://github.com/user-attachments/assets/f7604671-3f62-4f69-b1ca-e10f653a5184
 
-https://github.com/user-attachments/assets/48a45b81-5991-4749-82f4-b1e293652da6
+#### Demo: Respecting Relative Line Numbers
 
-https://github.com/user-attachments/assets/94d93dc9-9788-4501-a268-6d77258a5fdf
+https://github.com/user-attachments/assets/d91fac08-dd6c-4460-b75d-92c2493130c2
+
+#### Demo: Selecting to End of Visual Line
+
+https://github.com/user-attachments/assets/03fded94-a4fe-4889-a9e2-c5bf755f8eca
+
+#### Demo: Deleting to Beginning of Visual Line
+
+https://github.com/user-attachments/assets/48a45b81-5991-4749-82f4-b1e293652da6
 
 ## Installation
 
