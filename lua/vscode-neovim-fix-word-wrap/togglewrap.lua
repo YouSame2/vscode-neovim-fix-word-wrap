@@ -30,7 +30,6 @@ local function ToggleWrap(enabled, silent)
         return enabled
     end
 
-    -- capture exact current location
     local cur_tab = vim.api.nvim_get_current_tabpage()
     local cur_win = vim.api.nvim_get_current_win()
 
@@ -71,7 +70,6 @@ local function ToggleWrap(enabled, silent)
     return enabled
 end
 
--- expose the toggle function as the module's primary responsibility
 M.toggle_wrap = ToggleWrap
 
 return M

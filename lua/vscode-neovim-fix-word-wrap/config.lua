@@ -1,6 +1,5 @@
 local M = {}
 
--- Conditionally require the correct keymap file based on the environment
 local keymaps
 if vim.g.vscode then
     keymaps = require("vscode-neovim-fix-word-wrap.keymaps-vscode")
@@ -10,7 +9,6 @@ end
 
 M.config = {
     togglewrap_keymap = "<leader>uw",
-    -- autocmd toggles
     enable_recording_enter_autocmd = true,
     enable_vscode_sync_autocmd = true,
     keymaps = {
